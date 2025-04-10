@@ -26,16 +26,26 @@
       box-shadow: 0 5px #ccc;
       cursor: pointer;
       user-select: none;
+      position: relative;
     }
     .key.black {
       width: 40px;
       height: 120px;
       background: black;
-      position: relative;
-      margin-left: -20px;
-      margin-right: -20px;
-      z-index: 1;
+      position: absolute;
+      top: 0;
+      z-index: 2;
       color: white;
+    }
+    .key-label {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+    }
+    .wrapper {
+      position: relative;
+      display: flex;
     }
   </style>
 </head>
@@ -45,48 +55,45 @@
   <p>鍵盤をクリックして音を鳴らしてみよう！</p>
 
   <div class="piano">
-    <div class="key" data-note="C">ド</div>
-    <div class="key black" data-note="C#"></div>
-    <div class="key" data-note="D">レ</div>
-    <div class="key black" data-note="D#"></div>
-    <div class="key" data-note="E">ミ</div>
-    <div class="key" data-note="F">ファ</div>
-    <div class="key black" data-note="F#"></div>
-    <div class="key" data-note="G">ソ</div>
-    <div class="key black" data-note="G#"></div>
-    <div class="key" data-note="A">ラ</div>
-    <div class="key black" data-note="A#"></div>
-    <div class="key" data-note="B">シ</div>
-    <div class="key" data-note="C2">ド</div>
+    <div class="wrapper">
+      <div class="key" data-note="C"><div class="key-label">ド</div></div>
+      <div class="key black" style="left: 40px;" data-note="Csharp"></div>
+      <div class="key" data-note="D"><div class="key-label">レ</div></div>
+      <div class="key black" style="left: 120px;" data-note="Dsharp"></div>
+      <div class="key" data-note="E"><div class="key-label">ミ</div></div>
+      <div class="key" data-note="F"><div class="key-label">ファ</div></div>
+      <div class="key black" style="left: 280px;" data-note="Fsharp"></div>
+      <div class="key" data-note="G"><div class="key-label">ソ</div></div>
+      <div class="key black" style="left: 360px;" data-note="Gsharp"></div>
+      <div class="key" data-note="A"><div class="key-label">ラ</div></div>
+      <div class="key black" style="left: 440px;" data-note="Asharp"></div>
+      <div class="key" data-note="B"><div class="key-label">シ</div></div>
+      <div class="key" data-note="C2"><div class="key-label">ド</div></div>
+    </div>
   </div>
 
   <script>
-    const notes = {
-      'C': 'https://freesound.org/data/previews/415/415209_5121236-lq.mp3',
-      'C#': 'https://freesound.org/data/previews/415/415207_5121236-lq.mp3',
-      'D': 'https://freesound.org/data/previews/415/415204_5121236-lq.mp3',
-      'D#': 'https://freesound.org/data/previews/415/415203_5121236-lq.mp3',
-      'E': 'https://freesound.org/data/previews/415/415200_5121236-lq.mp3',
-      'F': 'https://freesound.org/data/previews/415/415197_5121236-lq.mp3',
-      'F#': 'https://freesound.org/data/previews/415/415196_5121236-lq.mp3',
-      'G': 'https://freesound.org/data/previews/415/415194_5121236-lq.mp3',
-      'G#': 'https://freesound.org/data/previews/415/415193_5121236-lq.mp3',
-      'A': 'https://freesound.org/data/previews/415/415191_5121236-lq.mp3',
-      'A#': 'https://freesound.org/data/previews/415/415189_5121236-lq.mp3',
-      'B': 'https://freesound.org/data/previews/415/415188_5121236-lq.mp3',
-      'C2': 'https://freesound.org/data/previews/415/415187_5121236-lq.mp3',
+    const noteMap = {
+      'C': 'sounds/C.mp3',
+      'Csharp': 'sounds/Csharp.mp3',
+      'D': 'sounds/D.mp3',
+      'Dsharp': 'sounds/Dsharp.mp3',
+      'E': 'sounds/E.mp3',
+      'F': 'sounds/F.mp3',
+      'Fsharp': 'sounds/Fsharp.mp3',
+      'G': 'sounds/G.mp3',
+      'Gsharp': 'sounds/Gsharp.mp3',
+      'A': 'sounds/A.mp3',
+      'Asharp': 'sounds/Asharp.mp3',
+      'B': 'sounds/B.mp3',
+      'C2': 'sounds/C2.mp3',
     };
 
     document.querySelectorAll('.key').forEach(key => {
       key.addEventListener('click', () => {
         const note = key.dataset.note;
-        if (note && notes[note]) {
-          const audio = new Audio(notes[note]);
+        if (noteMap[note]) {
+          const audio = new Audio(noteMap[note]);
           audio.play();
         }
-      });
-    });
-  </script>
-
-</body>
-</html>
+ 
