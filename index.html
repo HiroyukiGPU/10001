@@ -1,99 +1,195 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>ミニピアノ</title>
+  <meta charset="UTF-8">
+  <title>地震・津波情報</title>
   <style>
     body {
-      text-align: center;
-      background: #f2f2f2;
-      font-family: sans-serif;
-    }
-    h1 {
-      margin-top: 30px;
-    }
-    .piano {
+      font-family: Arial, sans-serif;
+      color: #333;
       display: flex;
-      justify-content: center;
-      margin-top: 50px;
+      flex-direction: column;
+      align-items: center;
+      margin: 0;
+      padding: 0;
     }
-    .key {
-      width: 60px;
-      height: 200px;
-      margin: 1px;
-      border: 1px solid #999;
-      background: white;
-      box-shadow: 0 5px #ccc;
-      cursor: pointer;
-      user-select: none;
-      position: relative;
+    h1, h2 {
+      color: #007bff;
     }
-    .key.black {
-      width: 40px;
-      height: 120px;
-      background: black;
-      position: absolute;
-      top: 0;
-      z-index: 2;
-      color: white;
-    }
-    .key-label {
-      position: absolute;
-      bottom: 10px;
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       width: 100%;
-      text-align: center;
+      max-width: 1200px;
+      padding: 20px;
     }
-    .wrapper {
-      position: relative;
-      display: flex;
+    .earthquake-info, .tsunami-info {
+      width: 100%;
+      max-width: 600px;
+      padding: 20px;
+      margin: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: calc(100% - 100px);
+      margin-right: 10px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .point {
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 5px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <div class="earthquake-info">
+      <h1>地震情報</h1>
+      <p id="eq-time"></p>
+      <p id="eq-hypocenter"></p>
+      <p id="eq-depth"></p>
+      <p id="eq-latlon"></p>
+      <p id="eq-scale"></p>
+      <p id="eq-mag"></p>
 
-  <h1>🎹 Web ピアノ</h1>
-  <p>鍵盤をクリックして音を鳴らしてみよう！</p>
+      <h2>影響を受けた地点</h2>
+      <form id="search-form">
+        <label for="search">地点を検索:</label>
+        <input type="text" id="search" autocomplete="on">
+        <button type="submit">検索</button>
+      </form>
+      <ul id="point-list"></ul>
+    </div>
 
-  <div class="piano">
-    <div class="wrapper">
-      <div class="key" data-note="C"><div class="key-label">ド</div></div>
-      <div class="key black" style="left: 40px;" data-note="Csharp"></div>
-      <div class="key" data-note="D"><div class="key-label">レ</div></div>
-      <div class="key black" style="left: 120px;" data-note="Dsharp"></div>
-      <div class="key" data-note="E"><div class="key-label">ミ</div></div>
-      <div class="key" data-note="F"><div class="key-label">ファ</div></div>
-      <div class="key black" style="left: 280px;" data-note="Fsharp"></div>
-      <div class="key" data-note="G"><div class="key-label">ソ</div></div>
-      <div class="key black" style="left: 360px;" data-note="Gsharp"></div>
-      <div class="key" data-note="A"><div class="key-label">ラ</div></div>
-      <div class="key black" style="left: 440px;" data-note="Asharp"></div>
-      <div class="key" data-note="B"><div class="key-label">シ</div></div>
-      <div class="key" data-note="C2"><div class="key-label">ド</div></div>
+    <div class="tsunami-info">
+      <h1>津波情報</h1>
+      <ul id="tsunami-list"></ul>
     </div>
   </div>
 
   <script>
-    const noteMap = {
-      'C': 'sounds/C.mp3',
-      'Csharp': 'sounds/Csharp.mp3',
-      'D': 'sounds/D.mp3',
-      'Dsharp': 'sounds/Dsharp.mp3',
-      'E': 'sounds/E.mp3',
-      'F': 'sounds/F.mp3',
-      'Fsharp': 'sounds/Fsharp.mp3',
-      'G': 'sounds/G.mp3',
-      'Gsharp': 'sounds/Gsharp.mp3',
-      'A': 'sounds/A.mp3',
-      'Asharp': 'sounds/Asharp.mp3',
-      'B': 'sounds/B.mp3',
-      'C2': 'sounds/C2.mp3',
+    const scaleMap = {
+      10: "1", 20: "2", 30: "3", 40: "4",
+      45: "5弱", 50: "5強", 55: "6弱", 60: "6強", 70: "7"
+    };
+    const colorMap = {
+      "7": "#96003c", "6強": "#ff5078", "6弱": "#ffaa46",
+      "5強": "#ffff00", "5弱": "#96ff5a", "4": "#1edc50",
+      "3": "#32c8b4", "2": "#32ffff", "1": "#b4b4b4", "不明": "#ffffff"
     };
 
-    document.querySelectorAll('.key').forEach(key => {
-      key.addEventListener('click', () => {
-        const note = key.dataset.note;
-        if (noteMap[note]) {
-          const audio = new Audio(noteMap[note]);
-          audio.play();
-        }
- 
+    function scaleConversion(scale) {
+      return scaleMap[scale] || "不明";
+    }
+
+    function getColor(scale) {
+      return colorMap[scale] || "#ffffff";
+    }
+
+    async function fetchData() {
+      try {
+        const eqRes = await fetch("https://api.p2pquake.net/v2/history?codes=551&limit=1");
+        const eqData = await eqRes.json();
+        const tsunamiRes = await fetch("https://api.p2pquake.net/v2/history?codes=552&limit=1");
+        const tsunamiData = await tsunamiRes.json();
+
+        renderEarthquake(eqData[0]);
+        renderTsunami(tsunamiData[0]);
+
+      } catch (e) {
+        alert("データの取得に失敗しました: " + e);
+      }
+    }
+
+    function renderEarthquake(data) {
+      const eq = data.earthquake;
+      const points = data.points.map(p => ({
+        ...p,
+        scale: scaleConversion(p.scale),
+        background: getColor(scaleConversion(p.scale))
+      }));
+
+      document.getElementById("eq-time").textContent = `発生日時: ${data.time}`;
+      document.getElementById("eq-hypocenter").textContent = `震源地: ${eq.hypocenter.name}`;
+      document.getElementById("eq-depth").textContent = `震源の深さ: ${eq.hypocenter.depth === 0 ? "ごく浅い" : eq.hypocenter.depth + " km"}`;
+      document.getElementById("eq-latlon").textContent = `緯度: ${eq.hypocenter.latitude} / 経度: ${eq.hypocenter.longitude}`;
+      document.getElementById("eq-scale").textContent = `最大震度: ${scaleConversion(eq.maxScale)}`;
+      document.getElementById("eq-mag").textContent = `マグニチュード: ${eq.hypocenter.magnitude}`;
+
+      const ul = document.getElementById("point-list");
+      ul.innerHTML = "";
+      window.fullPoints = points;
+      updateFilteredPoints(points);
+    }
+
+    function updateFilteredPoints(points, keyword = "") {
+      const ul = document.getElementById("point-list");
+      ul.innerHTML = "";
+      const results = points.filter(p => p.addr.includes(keyword));
+      if (results.length === 0) {
+        ul.innerHTML = "<li>検索結果が見つかりませんでした。</li>";
+      } else {
+        results.forEach(p => {
+          const li = document.createElement("li");
+          li.className = "point";
+          li.style.backgroundColor = p.background;
+          li.textContent = `${p.pref}${p.addr} (震度: ${p.scale})`;
+          ul.appendChild(li);
+        });
+      }
+    }
+
+    function renderTsunami(data) {
+      const ul = document.getElementById("tsunami-list");
+      ul.innerHTML = "";
+      if (!data || !data.areas) {
+        ul.innerHTML = "<li>津波の情報はありません。</li>";
+        return;
+      }
+
+      data.areas.forEach(area => {
+        const height = area.maxHeight.value;
+        let grade = "津波注意報";
+        if (height > 3) grade = "大津波警報";
+        else if (height > 1) grade = "津波警戒報";
+
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${area.name}</strong><br>
+          最大高さ: ${area.maxHeight.description}<br>
+          津波到達予想: ${area.firstHeight.arrivalTime || area.firstHeight.condition}<br>
+          警報ランク: ${grade}`;
+        ul.appendChild(li);
+      });
+    }
+
+    document.getElementById("search-form").addEventListener("submit", e => {
+      e.preventDefault();
+      const q = document.getElementById("search").value.trim();
+      updateFilteredPoints(window.fullPoints || [], q);
+    });
+
+    fetchData();
+  </script>
+</body>
+</html>
