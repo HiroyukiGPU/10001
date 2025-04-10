@@ -1,1 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>ミニピアノ</title>
+  <style>
+    body {
+      text-align: center;
+      background: #f2f2f2;
+      font-family: sans-serif;
+    }
+    h1 {
+      margin-top: 30px;
+    }
+    .piano {
+      display: flex;
+      justify-content: center;
+      margin-top: 50px;
+    }
+    .key {
+      width: 60px;
+      height: 200px;
+      margin: 1px;
+      border: 1px solid #999;
+      background: white;
+      box-shadow: 0 5px #ccc;
+      cursor: pointer;
+      user-select: none;
+    }
+    .key.black {
+      width: 40px;
+      height: 120px;
+      background: black;
+      position: relative;
+      margin-left: -20px;
+      margin-right: -20px;
+      z-index: 1;
+      color: white;
+    }
+  </style>
+</head>
+<body>
 
+  <h1>🎹 Web ピアノ</h1>
+  <p>鍵盤をクリックして音を鳴らしてみよう！</p>
+
+  <div class="piano">
+    <div class="key" data-note="C">ド</div>
+    <div class="key black" data-note="C#"></div>
+    <div class="key" data-note="D">レ</div>
+    <div class="key black" data-note="D#"></div>
+    <div class="key" data-note="E">ミ</div>
+    <div class="key" data-note="F">ファ</div>
+    <div class="key black" data-note="F#"></div>
+    <div class="key" data-note="G">ソ</div>
+    <div class="key black" data-note="G#"></div>
+    <div class="key" data-note="A">ラ</div>
+    <div class="key black" data-note="A#"></div>
+    <div class="key" data-note="B">シ</div>
+    <div class="key" data-note="C2">ド</div>
+  </div>
+
+  <script>
+    const notes = {
+      'C': 'https://freesound.org/data/previews/415/415209_5121236-lq.mp3',
+      'C#': 'https://freesound.org/data/previews/415/415207_5121236-lq.mp3',
+      'D': 'https://freesound.org/data/previews/415/415204_5121236-lq.mp3',
+      'D#': 'https://freesound.org/data/previews/415/415203_5121236-lq.mp3',
+      'E': 'https://freesound.org/data/previews/415/415200_5121236-lq.mp3',
+      'F': 'https://freesound.org/data/previews/415/415197_5121236-lq.mp3',
+      'F#': 'https://freesound.org/data/previews/415/415196_5121236-lq.mp3',
+      'G': 'https://freesound.org/data/previews/415/415194_5121236-lq.mp3',
+      'G#': 'https://freesound.org/data/previews/415/415193_5121236-lq.mp3',
+      'A': 'https://freesound.org/data/previews/415/415191_5121236-lq.mp3',
+      'A#': 'https://freesound.org/data/previews/415/415189_5121236-lq.mp3',
+      'B': 'https://freesound.org/data/previews/415/415188_5121236-lq.mp3',
+      'C2': 'https://freesound.org/data/previews/415/415187_5121236-lq.mp3',
+    };
+
+    document.querySelectorAll('.key').forEach(key => {
+      key.addEventListener('click', () => {
+        const note = key.dataset.note;
+        if (note && notes[note]) {
+          const audio = new Audio(notes[note]);
+          audio.play();
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
